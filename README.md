@@ -7,40 +7,12 @@ chmod +x start.sh   # first time only
 ./start.sh
 ```
 
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:3000 |
+| Service            | URL                        |
+| ------------------ | -------------------------- |
+| Frontend           | http://localhost:3000      |
 | API Docs (Swagger) | http://localhost:8000/docs |
 
 Place `order.xlsx` and `SKU.xlsx` in the project root before starting.
-
----
-
-## Dependencies
-
-**Backend** (Python, managed via `uv`)
-
-| Package | Purpose |
-|---------|---------|
-| `fastapi` + `uvicorn` | Web framework and ASGI server |
-| `httpx` | Async HTTP client for external API calls |
-| `openpyxl` | Read xlsx input files (order.xlsx, SKU.xlsx, mock-product.xlsx) |
-| `pydantic` | Request/response schema validation |
-| `python-dotenv` | Load environment variables from `.env` |
-| `pytest` + `pytest-asyncio` | Unit testing |
-
-**Frontend** (Node.js, managed via `npm`)
-
-| Package | Purpose |
-|---------|---------|
-| `react` + `react-dom` | UI framework |
-| `react-router-dom` | Client-side routing |
-| `vite` (v5) | Dev server and bundler |
-| `axios` | HTTP client for backend API calls |
-
----
-
-## Assumptions
 
 ### Input Data
 
@@ -48,26 +20,54 @@ Both files must be placed in the project root.
 
 **`order.xlsx`** — one row per order:
 
-| Column | Example |
-|--------|---------|
-| `OrderNo` | `PO-20251130-00072` |
-| `OrderDate` | `30/11/25` |
-| `Status` | `Completed` |
-| `CompanyName` | `ABC Pharmacy` |
-| `CustomerName` | `John Smith` |
-| `PhoneNumber` | `0412345678` |
-| `Email` | `john@abcpharma.com.au` |
-| `Address` | `123 Main St, Sydney NSW 2000` |
+| Column         | Example                        |
+| -------------- | ------------------------------ |
+| `OrderNo`      | `PO-20251130-00072`            |
+| `OrderDate`    | `30/11/25`                     |
+| `Status`       | `Completed`                    |
+| `CompanyName`  | `ABC Pharmacy`                 |
+| `CustomerName` | `John Smith`                   |
+| `PhoneNumber`  | `0412345678`                   |
+| `Email`        | `john@abcpharma.com.au`        |
+| `Address`      | `123 Main St, Sydney NSW 2000` |
 
 **`SKU.xlsx`** — one row per SKU line item, multiple rows can share the same `OrderNumber`:
 
-| Column | Example | Notes |
-|--------|---------|-------|
-| `SKU` | `NUBKIKP10` | Product code, looked up in product data source |
-| `QTY` | `2` | Quantity ordered |
-| `AssignedTracking` | `1` | Internal auto-increment ID |
-| `TrackingNo` | `2FWZ00006498987` | Carrier tracking number used for logistics queries |
-| `OrderNumber` | `PO-20251130-00072` | Foreign key linking to `order.xlsx` |
+| Column             | Example             | Notes                                              |
+| ------------------ | ------------------- | -------------------------------------------------- |
+| `SKU`              | `NUBKIKP10`         | Product code, looked up in product data source     |
+| `QTY`              | `2`                 | Quantity ordered                                   |
+| `AssignedTracking` | `1`                 | Internal auto-increment ID                         |
+| `TrackingNo`       | `2FWZ00006498987`   | Carrier tracking number used for logistics queries |
+| `OrderNumber`      | `PO-20251130-00072` | Foreign key linking to `order.xlsx`                |
+
+---
+
+## Dependencies
+
+**Backend** (Python, managed via `uv`)
+
+| Package                     | Purpose                                                         |
+| --------------------------- | --------------------------------------------------------------- |
+| `fastapi` + `uvicorn`       | Web framework and ASGI server                                   |
+| `httpx`                     | Async HTTP client for external API calls                        |
+| `openpyxl`                  | Read xlsx input files (order.xlsx, SKU.xlsx, mock-product.xlsx) |
+| `pydantic`                  | Request/response schema validation                              |
+| `python-dotenv`             | Load environment variables from `.env`                          |
+| `pytest` + `pytest-asyncio` | Unit testing                                                    |
+
+**Frontend** (Node.js, managed via `npm`)
+
+| Package               | Purpose                           |
+| --------------------- | --------------------------------- |
+| `react` + `react-dom` | UI framework                      |
+| `react-router-dom`    | Client-side routing               |
+| `vite` (v5)           | Dev server and bundler            |
+| `axios`               | HTTP client for backend API calls |
+
+---
+
+## Assumptions
 
 ### Product Data
 
@@ -93,12 +93,12 @@ Shipping origin is fixed at postcode `2111` (Ryde, NSW). Destination postcode an
 
 Carrier is identified from the tracking number format before any API call:
 
-| Pattern | Example | Carrier | How it's tracked |
-|---------|---------|---------|-----------------|
-| Starts with `2FWZ` | `2FWZ00006498987` | StarTrack/AusPost | AusPost Shipping API + web link |
-| Two letters + digits + `AU` | `EE123456789AU` | AusPost | AusPost Shipping API |
-| Pure numeric | `305506914` | TNT | TNT web-tracking URL |
-| Anything else | — | Unknown | Try AusPost → TNT → mark unknown |
+| Pattern                     | Example           | Carrier           | How it's tracked                 |
+| --------------------------- | ----------------- | ----------------- | -------------------------------- |
+| Starts with `2FWZ`          | `2FWZ00006498987` | StarTrack/AusPost | AusPost Shipping API + web link  |
+| Two letters + digits + `AU` | `EE123456789AU`   | AusPost           | AusPost Shipping API             |
+| Pure numeric                | `305506914`       | TNT               | TNT web-tracking URL             |
+| Anything else               | —                 | Unknown           | Try AusPost → TNT → mark unknown |
 
 StarTrack is an AusPost subsidiary and shares the same API (`GET /shipments/{id}/summary` with Basic Auth). A direct web-tracking link is always included for StarTrack results.
 
