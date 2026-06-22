@@ -44,9 +44,30 @@ Place `order.xlsx` and `SKU.xlsx` in the project root before starting.
 
 ### Input Data
 
-- `order.xlsx` contains order headers with columns: `OrderNo, OrderDate, Status, CompanyName, CustomerName, PhoneNumber, Email, Address`.
-- `SKU.xlsx` contains line items with columns: `SKU, QTY, AssignedTracking, OrderNumber`.
-- Both files must be placed in the project root.
+Both files must be placed in the project root.
+
+**`order.xlsx`** — one row per order:
+
+| Column | Example |
+|--------|---------|
+| `OrderNo` | `PO-20251130-00072` |
+| `OrderDate` | `30/11/25` |
+| `Status` | `Completed` |
+| `CompanyName` | `ABC Pharmacy` |
+| `CustomerName` | `John Smith` |
+| `PhoneNumber` | `0412345678` |
+| `Email` | `john@abcpharma.com.au` |
+| `Address` | `123 Main St, Sydney NSW 2000` |
+
+**`SKU.xlsx`** — one row per SKU line item, multiple rows can share the same `OrderNumber`:
+
+| Column | Example | Notes |
+|--------|---------|-------|
+| `SKU` | `NUBKIKP10` | Product code, looked up in product data source |
+| `QTY` | `2` | Quantity ordered |
+| `AssignedTracking` | `1` | Internal auto-increment ID |
+| `TrackingNo` | `2FWZ00006498987` | Carrier tracking number used for logistics queries |
+| `OrderNumber` | `PO-20251130-00072` | Foreign key linking to `order.xlsx` |
 
 ### Product Data
 
